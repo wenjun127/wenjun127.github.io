@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="Keywords" content="blog"/>
+    <meta name="Description" content="blog"/>
+    <title>Simple</title>
+    <link rel="shortcut icon" href="/static/favicon.png"/>
+    <link rel="stylesheet" type="text/css" href="/main.css" />
+</head>
+<body>
+<div class="main">
+    <div class="header">
+    	<ul id="pages">
+            <li><a href="/">home</a></li>
+            <li><a href="/#/tags">tags</a></li>
+            <li><a href="/#/archive">archive</a></li>
+    	</ul>
+    </div>
+	<div class="wrap-header">
+	<h1>
+    <a href="/" id="title"></a>
+	</h1>
+	</div>
+<div id="md" style="display: none;">
+<!-- markdown -->
+URL schemes,通过超链接打开App应用
+----
+
+需要详细了解URL schemes的请戳这[URL scheme](http://en.wikipedia.org/wiki/URI_scheme)。
+通俗点的说就是url的地址栏，比如：
+>输入http:......打开的是网页
+输入qqdl:......如果安装了腾讯的旋风下载工具，系统会自动启动旋风下载；
+输入thunder:......对应的就是打开迅雷下载了。
+
+对于iPhone手机，有一些特定的URL schemes，通过这些内置的URI schemes，我们开发一些基于web网页的iPhone应用会变得更加简单。
+
+给某人打电话：
+	
+	<a href="tel:180-1234-5678">打电话</a>
+给某人发短信：
+
+	<a href="sms:180-1234-5678">发短信</a>
+给某人发邮件：
+	
+	<a href="mailto:mouren@mail.com">发邮件</a>
+等等~~~
+一些常用内置的URL schemes苹果说明在[这里](https://developer.apple.com/library/ios/featuredarticles/iPhoneURLScheme_Reference/Introduction/Introduction.html)
+
+
+以上是一些内置的URL scheme，下面介绍如何通过URL scheme打开iPhone上的某个应用。
+直接上代码：
+	
+	<a href="weixin:">微信</a>
+	<a href="weibo:">微博</a>
+以上是分别打开微信，微博的方法。其实这里的weixin,weibo就是微信和微博的URL scheme，对于一个应用一般都有好几个URL scheme的比如qq，你可以通过以下任何一个URL scheme打开qq。
+
+	mqqflyticket:
+	mqqapi:
+	mqq:
+	mqqopensdkapi:
+	mqqOpensdkSSoLogin:
+	mqqapiwallet:
+	mqqopensdkapiV2:
+	
+**PS：当然，URL scheme的值也不是一沉不变的，开发者可能会对应用的URL scheme进行变更。**
+
+###通过url传递参数
+####内置url的参数示例（iphone）
+#####1、拨号（Phone Number）
+URL模式：tel://<strong>${PHONE_NUMBER}</strong>
+代码示例：
+
+	[[UIApplication sharedApplication] openURL:[NSURL 				URLWithString:@"tel://10086"]];  
+
+
+#####2、调用邮件客户端(Apple Mail)  
+URL模式：mailto://<strong>${EMAIL_ADDRESS}</strong>  
+代码示例：  
+  
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto://admin@eyecm.com"]]; 
+
+#####3、调用短信(SMS)  
+  
+URL模式：sms:<strong>${PHONENUMBER_OR_SHORTCODE}</strong>  
+代码示例：  
+  
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"sms:10086"]];  
+  
+#####4、调用应用商店(AppStore)  
+  
+URL模式：http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=291586600&mt=8  
+代码示例：  
+  
+	NSURL *appStoreUrl = [NSURL URLWithString:@"http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=291586600&amp;mt=8"];  
+	[[UIApplication sharedApplication] openURL:appStoreUrl];  
+
+####如何获取应用自定义url的参数
+**形式：**
+
+	<scheme name> : <hierarchical part> [ ? <query> ] [ # <fragment> ]
+iPhone应用程序可以通过获取url后面的参数来坐指定的事情，url如：
+myapp://?para1=123&para2=456
+其中字符串?para1=123&para2=456被称作查询串（query string）
+
+在应用中，app delegate必须实现以下的方法，并可以通过该方法获取参数。
+
+	-(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation 
+	{ 
+	  NSLog(@"URL scheme:%@", [url scheme]); 
+	  NSLog(@"URL query: %@", [url query]); 
+ 
+	  return YES; 
+	} 
+以上代码输出：
+ 
+	URL scheme:myapp 
+	URL query: para1=123&para2=456 
+
+
+	
+###如何获取一个应用的URL scheme
+参考：[伊卡木-如何找出iOS App的URL scheme](http://ikamu.me/8179)。
+
+####一、问iOS的程序员要
+>如果你是开发者，URL scheme可以在配置文件info.list中找到，或者在xcode中的info-URL Type中找到。如果你知道开发者，直接问他要吧。
+####二、Windows7系统，用itools查找
+>1.用[itoole](http://www.itools.cn/)查看iOS设备的应用程序
+>2.打开微信app
+>3.打开weixin.app文件夹，找到info.list文件
+>4.用记事本（或者notepad等编辑器）打开文件info.list，找到< key >CFBundleURLSchemes< /key >一行，其中< string>< /string>中的内容都是app的URL scheme
+
+####三、在越狱的iOS系统下，用iFile查找
+
+>1.打开iFile，通过路径/var/mobile/Applications下找到‘微信’文件夹（如果Applications目录下是乱码，请在偏好设置中设定显示应用名）。
+>2.进入‘微信’文件夹中的weixin.app
+>3.找到info.list并打开，找到同样的位置即可获取微信的URL scheme。
+
+
+----------
+
+
+	
+<!-- markdown end -->
+</div>
+<div class="entry" id="main">
+<!-- content -->
+<h2 id="urlschemesapp">URL schemes,通过超链接打开App应用</h2>
+
+<p>需要详细了解URL schemes的请戳这<a href="http://en.wikipedia.org/wiki/URI_scheme">URL scheme</a>。
+通俗点的说就是url的地址栏，比如：</p>
+
+<blockquote>
+  <p>输入http:......打开的是网页
+  输入qqdl:......如果安装了腾讯的旋风下载工具，系统会自动启动旋风下载；
+  输入thunder:......对应的就是打开迅雷下载了。</p>
+</blockquote>
+
+<p>对于iPhone手机，有一些特定的URL schemes，通过这些内置的URI schemes，我们开发一些基于web网页的iPhone应用会变得更加简单。</p>
+
+<p>给某人打电话：</p>
+
+<pre><code>&lt;a href="tel:180-1234-5678"&gt;打电话&lt;/a&gt;
+</code></pre>
+
+<p>给某人发短信：</p>
+
+<pre><code>&lt;a href="sms:180-1234-5678"&gt;发短信&lt;/a&gt;
+</code></pre>
+
+<p>给某人发邮件：</p>
+
+<pre><code>&lt;a href="mailto:mouren@mail.com"&gt;发邮件&lt;/a&gt;
+</code></pre>
+
+<p>等等~~~
+一些常用内置的URL schemes苹果说明在<a href="https://developer.apple.com/library/ios/featuredarticles/iPhoneURLScheme_Reference/Introduction/Introduction.html">这里</a></p>
+
+<p>以上是一些内置的URL scheme，下面介绍如何通过URL scheme打开iPhone上的某个应用。
+直接上代码：</p>
+
+<pre><code>&lt;a href="weixin:"&gt;微信&lt;/a&gt;
+&lt;a href="weibo:"&gt;微博&lt;/a&gt;
+</code></pre>
+
+<p>以上是分别打开微信，微博的方法。其实这里的weixin,weibo就是微信和微博的URL scheme，对于一个应用一般都有好几个URL scheme的比如qq，你可以通过以下任何一个URL scheme打开qq。</p>
+
+<pre><code>mqqflyticket:
+mqqapi:
+mqq:
+mqqopensdkapi:
+mqqOpensdkSSoLogin:
+mqqapiwallet:
+mqqopensdkapiV2:
+</code></pre>
+
+<p><strong>PS：当然，URL scheme的值也不是一沉不变的，开发者可能会对应用的URL scheme进行变更。</strong></p>
+
+<h3 id="url">通过url传递参数</h3>
+
+<h4 id="urliphone">内置url的参数示例（iphone）</h4>
+
+<h5 id="1phonenumber">1、拨号（Phone Number）</h5>
+
+<p>URL模式：tel://<strong>${PHONE_NUMBER}</strong>
+代码示例：</p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL               URLWithString:@"tel://10086"]];  
+</code></pre>
+
+<h5 id="2applemail">2、调用邮件客户端(Apple Mail)</h5>
+
+<p>URL模式：mailto://<strong>${EMAIL_ADDRESS}</strong> <br>
+代码示例：  </p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto://admin@eyecm.com"]]; 
+</code></pre>
+
+<h5 id="3sms">3、调用短信(SMS)</h5>
+
+<p>URL模式：sms:<strong>${PHONENUMBER<em>OR</em>SHORTCODE}</strong> <br>
+代码示例：  </p>
+
+<pre><code>[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"sms:10086"]];  
+</code></pre>
+
+<h5 id="4appstore">4、调用应用商店(AppStore)</h5>
+
+<p>URL模式：http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=291586600&amp;mt=8 <br>
+代码示例：  </p>
+
+<pre><code>NSURL *appStoreUrl = [NSURL URLWithString:@"http://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=291586600&amp;amp;mt=8"];  
+[[UIApplication sharedApplication] openURL:appStoreUrl];  
+</code></pre>
+
+<h4 id="url">如何获取应用自定义url的参数</h4>
+
+<p><strong>形式：</strong></p>
+
+<pre><code>&lt;scheme name&gt; : &lt;hierarchical part&gt; [ ? &lt;query&gt; ] [ # &lt;fragment&gt; ]
+</code></pre>
+
+<p>iPhone应用程序可以通过获取url后面的参数来坐指定的事情，url如：
+myapp://?para1=123&amp;para2=456
+其中字符串?para1=123&amp;para2=456被称作查询串（query string）</p>
+
+<p>在应用中，app delegate必须实现以下的方法，并可以通过该方法获取参数。</p>
+
+<pre><code>-(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation 
+{ 
+  NSLog(@"URL scheme:%@", [url scheme]); 
+  NSLog(@"URL query: %@", [url query]); 
+
+  return YES; 
+} 
+</code></pre>
+
+<p>以上代码输出：</p>
+
+<pre><code>URL scheme:myapp 
+URL query: para1=123&amp;para2=456 
+</code></pre>
+
+<h3 id="urlscheme">如何获取一个应用的URL scheme</h3>
+
+<p>参考：<a href="http://ikamu.me/8179">伊卡木-如何找出iOS App的URL scheme</a>。</p>
+
+<h4 id="ios">一、问iOS的程序员要</h4>
+
+<blockquote>
+  <p>如果你是开发者，URL scheme可以在配置文件info.list中找到，或者在xcode中的info-URL Type中找到。如果你知道开发者，直接问他要吧。</p>
+</blockquote>
+
+<h4 id="windows7itools">二、Windows7系统，用itools查找</h4>
+
+<blockquote>
+  <p>1.用<a href="http://www.itools.cn/">itoole</a>查看iOS设备的应用程序
+  2.打开微信app
+  3.打开weixin.app文件夹，找到info.list文件
+  4.用记事本（或者notepad等编辑器）打开文件info.list，找到&lt; key &gt;CFBundleURLSchemes&lt; /key &gt;一行，其中&lt; string&gt;&lt; /string&gt;中的内容都是app的URL scheme</p>
+</blockquote>
+
+<h4 id="iosifile">三、在越狱的iOS系统下，用iFile查找</h4>
+
+<blockquote>
+  <p>1.打开iFile，通过路径/var/mobile/Applications下找到‘微信’文件夹（如果Applications目录下是乱码，请在偏好设置中设定显示应用名）。
+  2.进入‘微信’文件夹中的weixin.app
+  3.找到info.list并打开，找到同样的位置即可获取微信的URL scheme。</p>
+</blockquote>
+
+<hr>
+<!-- content end -->
+</div>
+<br>
+<br>
+    <div id="disqus_thread"></div>
+	<div class="footer">
+		<p>© Copyright 2014 by isnowfy, Designed by isnowfy</p>
+	</div>
+</div>
+<script src="main.js"></script>
+<script id="content" type="text/mustache">
+    <h1>{{title}}</h1>
+    <div class="tag">
+    {{date}}
+    {{#tags}}
+    <a href="/#/tag/{{name}}">#{{name}}</a>
+    {{/tags}}
+    </div>
+</script>
+<script id="pagesTemplate" type="text/mustache">
+    {{#pages}}
+    <li>
+        <a href="{{path}}">{{title}}</a>
+    </li>
+    {{/pages}}
+</script>
+<script>
+$(document).ready(function() {
+    $.ajax({
+        url: "main.json",
+        type: "GET",
+        dataType: "json",
+        success: function(data) {
+            $("#title").html(data.name);
+            var pagesTemplate = Hogan.compile($("#pagesTemplate").html());
+            var pagesHtml = pagesTemplate.render({"pages": data.pages});
+            $("#pages").append(pagesHtml);
+            //path
+            var path = "urlschemes.html";
+            //path end
+            var now = 0;
+            for (var i = 0; i < data.posts.length; ++i)
+                if (path == data.posts[i].path)
+                    now = i;
+            var post = data.posts[now];
+            var tmp = post.tags.split(" ");
+            var tags = [];
+            for (var i = 0; i < tmp.length; ++i)
+                if (tmp[i].length > 0)
+                    tags.push({"name": tmp[i]});
+            var contentTemplate = Hogan.compile($("#content").html());
+            var contentHtml = contentTemplate.render({"title": post.title, "tags": tags, "date": post.date});
+            $("#main").prepend(contentHtml);
+            if (data.disqus_shortname.length > 0) {
+                var disqus_shortname = data.disqus_shortname;
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            }
+        }
+    });
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ["\\(", "\\)"]], processEscapes: true}});
+</script>
+</body>
+</html>
